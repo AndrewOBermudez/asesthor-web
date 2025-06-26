@@ -1,0 +1,34 @@
+/* src/pages/Dashboard.css */
+
+.dashboard-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .logout-button {
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .logout-button:hover {
+    background-color: #d32f2f;
+  }
+  
+  .charts-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .chart-item {
+    flex: 1 1 45%;
+  }
+  
+  .map-section {
+    margin-top: 40px;
+  }
+  
