@@ -7,8 +7,10 @@ import { Delete, Edit, Photo } from "@mui/icons-material";
 import ActividadesTable from "../components/ActividadesTable"; // Reutiliza este componente para mostrar ejecutivos
 import ExportCSVButton from "../components/ExportCSVButton"; // Importar el botón de exportación
 import FotosModal from "../components/FotosModal";
+import { useAuth } from "../context/AuthContext";
 
 const GestionEjecutivos = () => {
+  const { user, logout } = useAuth();
   const [ejecutivos, setEjecutivos] = useState([]);
   const [open, setOpen] = useState(false);
   const [currentEjecutivo, setCurrentEjecutivo] = useState(null);
@@ -81,6 +83,14 @@ const GestionEjecutivos = () => {
   return (
     <div className="gestion-ejecutivos-container">
       <h1>Gestión de Ejecutivos</h1>
+      {user && user.email && (
+        <div style={{ marginBottom: '10px', color: '#555', fontWeight: 'bold' }}>
+          Usuario: {user.email}
+        </div>
+      )}
+      <Button onClick={logout} variant="contained" color="secondary" style={{ marginBottom: '20px', marginRight: '10px' }}>
+        Cerrar Sesión
+      </Button>
       <Button variant="contained" color="primary" onClick={handleAdd} style={{ marginRight: "10px" }}>
         Añadir Ejecutivo
       </Button>

@@ -144,6 +144,11 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <h1>Bienvenido al Dashboard</h1>
+      {user && user.email && (
+        <div style={{ marginBottom: '10px', color: '#555', fontWeight: 'bold' }}>
+          Usuario: {user.email}
+        </div>
+      )}
       <Button
         onClick={handleLogout}
         variant="contained"
