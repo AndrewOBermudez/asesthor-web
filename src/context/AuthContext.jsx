@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth, login, logout } from "../firebaseConfig"; // Importamos las funciones de firebase.js
+import { auth, login as firebaseLogin, logout as firebaseLogout } from "../firebaseConfig"; // Importamos las funciones de firebase.js
 import { onAuthStateChanged } from "firebase/auth";
 
 // Crear el contexto de autenticación
@@ -18,6 +18,10 @@ export const AuthProvider = ({ children }) => {
 
         return () => unsubscribe();
     }, []);
+
+    // Funciones de login y logout
+    const login = (email, password) => firebaseLogin(email, password);
+    const logout = () => firebaseLogout();
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>
