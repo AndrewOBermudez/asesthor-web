@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import "./Dashboard.css";
 
 const Dashboard = () => {
-  const { logout, user } = useAuth(); // 'user' contiene información del jefe, incluyendo su zona
+  const { user, logout } = useAuth();
   const [actividades, setActividades] = useState([]);
   const [fotosModalOpen, setFotosModalOpen] = useState(false);
   const [fotosParaMostrar, setFotosParaMostrar] = useState({
@@ -24,6 +24,7 @@ const Dashboard = () => {
   });
   const [selectedExecutiveId, setSelectedExecutiveId] = useState("");
   const [selectedDate, setSelectedDate] = useState(null); // Estado para la fecha seleccionada
+  const [loading, setLoading] = useState(true);
 
   const handleLogout = async () => {
     try {
@@ -40,6 +41,8 @@ const Dashboard = () => {
         setActividades(data);
       } catch (error) {
         console.error("Error al obtener actividades:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchActividades();
@@ -140,6 +143,8 @@ const Dashboard = () => {
   const handleDateChange = (newValue) => {
     setSelectedDate(newValue);
   };
+
+  if (loading) return <div>Cargando...</div>;
 
   return (
     <div className="dashboard-container">
