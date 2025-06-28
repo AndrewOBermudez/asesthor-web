@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { auth, login as firebaseLogin, logout as firebaseLogout } from "../firebaseConfig"; // Importamos las funciones de firebase.js
+import {doc, getDoc} from "firebase/firestore";
+import {db, auth, login as firebaseLogin, logout as firebaseLogout } from "../firebaseConfig"; // Importamos las funciones de firebase.js
 import { onAuthStateChanged } from "firebase/auth";
 
 // Crear el contexto de autenticación
@@ -11,8 +12,17 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+        const unsubscribe = onAuthStateChanged(auth, async(currentUser) => {
+            if(currentUser){
+                const userDoc = await getDoc(doc(db, "usuarios", currentUser.uid));
+                let zone = "";
+                if (userDoc.exists()) {
+                    zone = userDoc.data().zone || "";
+                }
+                setUser({ ...currentUser,zone})
+            }else{
+                setUser(null);
+            }
             setLoading(false);
         });
 

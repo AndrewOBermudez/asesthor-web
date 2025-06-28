@@ -2,6 +2,8 @@
 import {
   collection,
   getDocs,
+  query,
+  where,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -17,25 +19,11 @@ import { db } from "../firebaseConfig";
  * Obtener todas las actividades de ejecutivos
  * @returns {Promise<Array>} Lista de actividades
  */
-export const getActividadesEjecutivo = async () => {
-  const actividadesCol = collection(db, "actividades_ejecutivo");
-  const actividadesSnapshot = await getDocs(actividadesCol);
-  const actividadesList = actividadesSnapshot.docs.map((doc) => {
-    const data = doc.data();
-    const fotos = data.fotos
-      ? data.fotos.map((foto) => ({
-          ...foto,
-          timestamp: foto.timestamp.toDate(), // Convertir Firestore Timestamp a Date
-        }))
-      : [];
-    return {
-      id: doc.id,
-      ...data,
-      fecha: data.fecha.toDate(), // Convertir Firestore Timestamp a Date
-      fotos: fotos,
-    };
-  });
-  return actividadesList;
+export const getActividadesEjecutivo = async (zone) => {
+  const actividadesRef = collection(db, "actividades_ejecutivo");
+  const q = query(actividadesRef, where("zone", "==", zone));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
 /**
