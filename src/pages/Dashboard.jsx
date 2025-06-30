@@ -1,5 +1,5 @@
 // src/pages/Dashboard.jsx
-import React, { act, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import BarChartComponent from "../components/BarChartComponent";
 import LineChartComponent from "../components/LineChartComponent";
@@ -18,6 +18,24 @@ import { addDoc, collection, Timestamp} from "firebase/firestore";
 import { db } from "../firebaseConfig"; 
 import dayjs from 'dayjs';
 import "./Dashboard.css";
+
+// Normaliza cualquier tipo de fecha a un objeto Date
+const normalizarFecha = (fecha) => {
+  if (!fecha) return null;
+  if (typeof fecha.toDate === "function") return fecha.toDate();
+  if (typeof fecha === "string" || typeof fecha === "number") return new Date(fecha);
+  if (fecha instanceof Date) return fecha;
+  return null;
+};
+
+// Normaliza todas las fotos de una actividad
+const normalizarFotos = (fotos) => {
+  if (!Array.isArray(fotos)) return [];
+  return fotos.map(foto => ({
+    ...foto,
+    timestamp: normalizarFecha(foto.timestamp),
+  }));
+};
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -171,7 +189,7 @@ const Dashboard = () => {
       }
     };
     fetchActividades();
-  }, [user?.zone]);
+  }, [user]);
   
 
   useEffect(() => {
@@ -186,6 +204,13 @@ const Dashboard = () => {
   // Filtrar actividades por zona del jefe
   let actividadesFiltradas = [...actividades];
 
+  // Normalizar fechas y fotos de todas las actividades antes de cualquier uso
+  actividadesFiltradas = actividadesFiltradas.map(actividad => ({
+    ...actividad,
+    fecha: normalizarFecha(actividad.fecha),
+    fotos: normalizarFotos(actividad.fotos),
+  }));
+
   // Filtrar por ejecutivo seleccionado
   if (selectedExecutiveId) {
     actividadesFiltradas = actividadesFiltradas.filter(
@@ -196,9 +221,10 @@ const Dashboard = () => {
   // Filtrar por fecha seleccionada
   if (selectedDate) {
     const fechaSeleccionada = dayjs(selectedDate).startOf('day');
-    actividadesFiltradas = actividadesFiltradas.filter((actividad) =>
-      dayjs(actividad.fecha).isSame(fechaSeleccionada, 'day')
-    );
+    actividadesFiltradas = actividadesFiltradas.filter((actividad) => {
+      const fechaObj = normalizarFecha(actividad.fecha);
+      return dayjs(fechaObj).isSame(fechaSeleccionada, 'day');
+    });
   }
 
   // Obtener lista de ejecutivos únicos en la zona
@@ -216,17 +242,23 @@ const Dashboard = () => {
   console.log("Ejecutivos para el selector:", ejecutivos);
 
   // Procesar datos para los gráficos según la selección
-  const datosCreditos = actividadesFiltradas.map((actividad) => ({
-    label: `${dayjs(actividad.fecha).format('YYYY-MM-DD')} - ${actividad.fullName}`,
-    creditosACargar: actividad.creditosACargar,
-    creditosListos: actividad.creditosListos,
-  }));
+  const datosCreditos = actividadesFiltradas.map((actividad) => {
+    const fechaObj = normalizarFecha(actividad.fecha);
+    return {
+      label: `${dayjs(fechaObj).format('YYYY-MM-DD')} - ${actividad.fullName}`,
+      creditosACargar: actividad.creditosACargar,
+      creditosListos: actividad.creditosListos,
+    };
+  });
   
 
-  const datosDesembolsos = actividadesFiltradas.map((actividad) => ({
-    fecha: actividad.fecha && actividad.fecha.toDate?actividad.fecha.toDate().toLocaleDateString(): new Date(actividad.fecha).toLocaleDateString(),
-    numeroDesembolsos: actividad.numeroDesembolsos,
-  }));
+  const datosDesembolsos = actividadesFiltradas.map((actividad) => {
+    const fechaObj = normalizarFecha(actividad.fecha);
+    return {
+      fecha: fechaObj ? fechaObj.toLocaleDateString() : "Sin fecha",
+      numeroDesembolsos: actividad.numeroDesembolsos,
+    };
+  });
 
   const datosPie = [
     {
@@ -248,13 +280,10 @@ const Dashboard = () => {
   // Aplanar todas las fotos de todas las actividades seleccionadas
   const ubicaciones = actividadesFiltradas.flatMap((actividad) => {
     return actividad.fotos.map((foto, index) => ({
-      id: `${actividad.ejecutivoId}-${foto.timestamp && foto.timestamp.toDate?foto.timestamp.toDate().toISOString():new Date(foto.timestamp).toISOString}-${index}`, // Clave única combinando ejecutivoId, timestamp e índice
+      ...foto,
+      id: `${actividad.ejecutivoId}-${foto.timestamp && foto.timestamp.toISOString ? foto.timestamp.toISOString() : index}`,
       nombre: actividad.fullName,
       concesionario: actividad.concesionario || "N/A",
-      latitud: foto.latitud,
-      longitud: foto.longitud,
-      url: foto.url,
-      timestamp: foto.timestamp, // Asegúrate de que es un objeto Date
     }));
   });
 
@@ -264,7 +293,9 @@ const Dashboard = () => {
       console.error("Las fotos no están definidas o no son un array.");
       return;
     }
-    setFotosParaMostrar({ fotos, nombre, concesionario });
+    // Normalizar los timestamps de las fotos antes de mostrar
+    const fotosNormalizadas = normalizarFotos(fotos);
+    setFotosParaMostrar({ fotos: fotosNormalizadas, nombre, concesionario });
     setFotosModalOpen(true);
   };
 
