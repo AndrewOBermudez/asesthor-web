@@ -7,10 +7,6 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
-import { Photo } from "@mui/icons-material";
-import { IconButton, Tooltip } from "@mui/material";
-
-// Definir un icono personalizado usando las imágenes en 'public/assets'
 const customIcon = new L.Icon({
   iconUrl: "/assets/marker-icon.png",
   iconRetinaUrl: "/assets/marker-icon-2x.png",

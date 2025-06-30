@@ -1,34 +1,102 @@
 /* src/pages/Dashboard.css */
 
+/* Contenedor principal del dashboard */
 .dashboard-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .logout-button {
-    padding: 10px 20px;
-    margin-bottom: 20px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .logout-button:hover {
-    background-color: #d32f2f;
-  }
-  
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.dashboard-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.dashboard-container > div {
+  margin-bottom: 24px;
+}
+
+.logout-button {
+  margin-right: 16px;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.chart-item {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  padding: 24px 16px 32px 16px;
+  min-width: 0;
+  position: relative;
+}
+
+.chart-item h2 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+/* Leyenda de los gráficos siempre visible y arriba de otros elementos */
+.recharts-legend-wrapper {
+  z-index: 2 !important;
+  background: #fff;
+  padding: 4px 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* Mejorar el espaciado de los filtros y botones */
+.dashboard-container > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Botón de ver fotos */
+.dashboard-container button {
+  min-width: 180px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Mapa con borde y sombra */
+.map-section {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  padding: 24px 16px;
+  margin-bottom: 32px;
+}
+
+.map-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+}
+
+/* Responsive para móviles */
+@media (max-width: 900px) {
   .charts-section {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    grid-template-columns: 1fr;
   }
-  
-  .chart-item {
-    flex: 1 1 45%;
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 8px 2px;
   }
-  
-  .map-section {
-    margin-top: 40px;
+  .chart-item, .map-section {
+    padding: 12px 4px;
   }
+}
   
